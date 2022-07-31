@@ -1,0 +1,35 @@
+version: '3.7'
+
+services:
+  db_wordpress:
+    image: mysql:8.0.27
+    container_name: db_wordpress_ctn
+    ports:
+      - "8086:3306"
+    volumes:
+      - wordpress_db_data:/var/lib/mysql
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
+      MYSQL_DATABASE: "${MYSQL_DATABASE}"
+      MYSQL_USER: "${MYSQL_USER}"
+      MYSQL_PASSWORD: "${MYSQL_PASSWORD}"
+
+  wordpress:
+    depends_on:
+      - db_wordpress
+    image: wordpress:latest
+    container_name: wordpress_ctn
+    ports:
+      - "2100:80"
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      WORDPRESS_DB_HOST: db_wordpress:3306
+      WORDPRESS_DB_USER: "${WORDPRESS_DB_USER}"
+      WORDPRESS_DB_PASSWORD: "${WORDPRESS_DB_PASSWORD}"
+volumes:
+  wordpress_db_data:
